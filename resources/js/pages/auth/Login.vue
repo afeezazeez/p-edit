@@ -11,12 +11,11 @@ import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import PasskeyVerify from '@/components/PasskeyVerify.vue';
 
 defineOptions({
     layout: {
-        title: 'Log in to your account',
-        description: 'Enter your email and password below to log in',
+        title: 'Welcome back',
+        description: 'Sign in to continue creating images.',
     },
 });
 
@@ -31,12 +30,11 @@ defineProps<{
 
     <div
         v-if="status"
-        class="mb-4 text-center text-sm font-medium text-green-600"
+        role="status"
+        class="mb-4 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-sm font-medium"
     >
         {{ status }}
     </div>
-
-    <PasskeyVerify />
 
     <Form
         v-bind="store.form()"
@@ -46,7 +44,9 @@ defineProps<{
     >
         <div class="grid gap-6">
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="email">
+                    Email address <span aria-hidden="true">*</span>
+                </Label>
                 <Input
                     id="email"
                     type="email"
@@ -62,7 +62,9 @@ defineProps<{
 
             <div class="grid gap-2">
                 <div class="flex items-center justify-between">
-                    <Label for="password">Password</Label>
+                    <Label for="password">
+                        Password <span aria-hidden="true">*</span>
+                    </Label>
                     <TextLink
                         v-if="canResetPassword"
                         :href="request()"
