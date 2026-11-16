@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Pixelforge;
+namespace App\Services;
 
 use App\Enums\GenerationStatus;
 use App\Models\Generation;
+use App\Pixelforge\PriceCalculator;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 

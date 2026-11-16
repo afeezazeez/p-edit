@@ -6,7 +6,7 @@ use App\Http\Requests\EstimateGenerationRequest;
 use App\Http\Requests\StoreGenerationRequest;
 use App\Http\Resources\GenerationEstimateResource;
 use App\Http\Resources\GenerationResource;
-use App\Pixelforge\GenerationService;
+use App\Services\GenerationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;

@@ -3,9 +3,9 @@
 namespace App\Jobs;
 
 use App\Models\Generation;
-use App\Pixelforge\ApplyGenerationResult;
 use App\Pixelforge\PixelforgeClient;
 use App\Pixelforge\PixelforgeException;
+use App\Services\ApplyGenerationResult;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

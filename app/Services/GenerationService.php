@@ -1,10 +1,13 @@
 <?php
 
-namespace App\Pixelforge;
+namespace App\Services;
 
 use App\Enums\GenerationStatus;
 use App\Models\Generation;
 use App\Models\User;
+use App\Pixelforge\PixelforgeClient;
+use App\Pixelforge\PixelforgeException;
+use App\Pixelforge\PriceCalculator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
