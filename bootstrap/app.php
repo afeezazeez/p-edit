@@ -2,11 +2,14 @@
 
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Pixelforge\PixelforgeException;
+use App\Pixelforge\WebhookRejectedException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+        $middleware->validateCsrfTokens(except: ['webhooks/pixelforge']);
 
         $middleware->web(append: [
             HandleAppearance::class,
@@ -27,4 +31,28 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(function (PixelforgeException $exception, Request $request) {
+            if (! $request->expectsJson()) {
+                return back()->with('error', $exception->getMessage());
+            }
+
+            $status = $exception->requestWasAccepted
+                ? HttpResponse::HTTP_ACCEPTED
+                : ($exception->statusCode ?? HttpResponse::HTTP_BAD_GATEWAY);
+            $response = response()->json(
+                ['message' => $exception->getMessage()],
+                $status,
+            );
+            if ($exception->retryAfter !== null) {
+                $response->header('Retry-After', (string) $exception->retryAfter);
+            }
+
+            return $response;
+        });
+
+        $exceptions->render(fn (WebhookRejectedException $exception) => response()->json(
+            ['message' => $exception->getMessage()],
+            HttpResponse::HTTP_BAD_REQUEST,
+        ));
     })->create();
