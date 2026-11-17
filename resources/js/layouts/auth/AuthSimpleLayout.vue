@@ -9,7 +9,9 @@ defineProps<{
 </script>
 
 <template>
-    <main class="h-svh overflow-hidden bg-background text-foreground lg:grid lg:grid-cols-2">
+    <main
+        class="h-svh overflow-hidden bg-background text-foreground lg:grid lg:grid-cols-2"
+    >
         <section
             class="relative hidden h-full flex-col justify-between overflow-hidden bg-primary p-8 text-primary-foreground lg:flex xl:p-10"
         >
@@ -26,19 +28,28 @@ defineProps<{
                 :href="home()"
                 class="relative z-10 inline-flex min-h-11 w-fit items-center gap-3 rounded-md font-semibold tracking-tight focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
             >
-                <span class="grid size-9 grid-cols-2 gap-1 rounded-xl border border-primary-foreground/20 bg-primary-foreground/10 p-2">
+                <span
+                    class="grid size-9 grid-cols-2 gap-1 rounded-xl border border-primary-foreground/20 bg-primary-foreground/10 p-2"
+                >
                     <span class="rounded-sm bg-primary-foreground" />
                     <span class="rounded-sm bg-primary-foreground/55" />
                     <span class="rounded-sm bg-primary-foreground/55" />
                     <span class="rounded-sm bg-primary-foreground" />
                 </span>
-                    <span>Image <span class="font-normal opacity-70">Studio</span></span>
+                <span
+                    >Image
+                    <span class="font-normal opacity-70">Studio</span></span
+                >
             </Link>
 
             <div class="relative z-10 mx-auto w-full max-w-xl py-6">
-                <h1 class="max-w-lg text-4xl leading-tight font-semibold tracking-tight xl:text-5xl">
+                <h1
+                    class="max-w-lg text-4xl leading-tight font-semibold tracking-tight xl:text-5xl"
+                >
                     Start with an idea.
-                    <span class="block opacity-65">See where it takes you.</span>
+                    <span class="block opacity-65"
+                        >See where it takes you.</span
+                    >
                 </h1>
                 <p class="mt-5 max-w-md text-base leading-7 opacity-75">
                     Describe the image you have in mind, choose a size and
@@ -70,8 +81,14 @@ defineProps<{
                             class="absolute right-[-16%] bottom-[-53%] left-[-16%] h-[64%] rounded-[50%] bg-slate-950/65"
                         />
                         <div class="relative z-10">
-                            <p class="text-xs font-medium tracking-wide text-white/75">IMAGE PREVIEW</p>
-                            <p class="mt-1 text-lg font-medium text-white sm:text-xl">
+                            <p
+                                class="text-xs font-medium tracking-wide text-white/75"
+                            >
+                                IMAGE PREVIEW
+                            </p>
+                            <p
+                                class="mt-1 text-lg font-medium text-white sm:text-xl"
+                            >
                                 A quiet coast at dusk
                             </p>
                         </div>
@@ -81,19 +98,25 @@ defineProps<{
                             1024 × 1024
                         </span>
                     </div>
-                    <div class="flex items-center justify-between gap-4 px-2 pt-4 pb-1">
+                    <div
+                        class="flex items-center justify-between gap-4 px-2 pt-4 pb-1"
+                    >
                         <div>
-                            <p class="text-sm font-medium">Your prompt, your choices</p>
-                            <p class="mt-1 text-xs opacity-65">Your idea, brought into focus</p>
+                            <p class="text-sm font-medium">
+                                Your prompt, your choices
+                            </p>
+                            <p class="mt-1 text-xs opacity-65">
+                                Your idea, brought into focus
+                            </p>
                         </div>
-                        <span class="rounded-full bg-primary-foreground/10 px-3 py-1.5 text-xs font-medium">
+                        <span
+                            class="rounded-full bg-primary-foreground/10 px-3 py-1.5 text-xs font-medium"
+                        >
                             Price shown up front
                         </span>
                     </div>
                 </div>
-
             </div>
-
         </section>
 
         <section class="flex h-full flex-col px-6 py-5 sm:px-10 lg:px-14">
@@ -101,7 +124,9 @@ defineProps<{
                 :href="home()"
                 class="inline-flex min-h-11 w-fit items-center gap-2 rounded-md font-semibold tracking-tight focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
             >
-                <span class="grid size-8 grid-cols-2 gap-1 rounded-lg bg-primary p-1.5 text-primary-foreground">
+                <span
+                    class="grid size-8 grid-cols-2 gap-1 rounded-lg bg-primary p-1.5 text-primary-foreground"
+                >
                     <span class="rounded-sm bg-current" />
                     <span class="rounded-sm bg-current opacity-55" />
                     <span class="rounded-sm bg-current opacity-55" />
@@ -126,7 +151,6 @@ defineProps<{
                     <slot />
                 </div>
             </div>
-
         </section>
     </main>
 </template>
