@@ -2,19 +2,21 @@
 
 use App\Pixelforge\PriceCalculator;
 
-it('calculates a conservative estimate using live pricing inputs without rounding money', function () {
+it('estimates the expected price at the reasoning midpoint and returns its range', function () {
     $pricing = pixelforgePricing();
     $estimate = app(PriceCalculator::class)->estimate(
         str_repeat('a', 400), 2, '1536x1024', 'high', $pricing,
     );
 
-    expect($estimate['provider_cost'])->toBe('0.37387500000')
-        ->and($estimate['estimated_cost'])->toBe('0.46734375000')
+    expect($estimate['provider_cost'])->toBe('0.33012500000')
+        ->and($estimate['estimated_cost'])->toBe('0.41265625000')
+        ->and($estimate['estimated_min_cost'])->toBe('0.35796875000')
+        ->and($estimate['estimated_max_cost'])->toBe('0.46734375000')
         ->and($estimate['estimated_usage'])->toBe([
             'input_text_tokens' => 115,
             'input_image_tokens' => 1530,
             'output_tokens' => 6450,
-            'reasoning_tokens' => 8000,
+            'reasoning_tokens' => 4500,
         ]);
 });
 

@@ -9,6 +9,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -34,7 +35,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (PixelforgeException $exception, Request $request) {
             if (! $request->expectsJson()) {
-                return back()->with('error', $exception->getMessage());
+                Inertia::flash('toast', [
+                    'type' => 'error',
+                    'message' => $exception->requestWasAccepted
+                        ? 'Pixelforge received the request, but its status is not confirmed yet. Check your generations before retrying.'
+                        : 'We could not submit this image request. Please try again.',
+                ]);
+
+                return back();
             }
 
             $status = $exception->requestWasAccepted

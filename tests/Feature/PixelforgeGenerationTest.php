@@ -13,6 +13,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -52,7 +53,11 @@ it('estimates the user price from live provider pricing', function () {
 
     $this->actingAs($user)->postJson('/generations/estimate', [
         'prompt' => 'A lighthouse', 'size' => '1024x1024', 'quality' => 'low',
-    ])->assertOk()->assertJsonPath('data.estimated_cost', '0.02183750000');
+    ])->assertOk()
+        ->assertJsonPath('data.estimated_cost', '0.01793125000')
+        ->assertJsonPath('data.estimated_min_cost', '0.01402500000')
+        ->assertJsonPath('data.estimated_max_cost', '0.02183750000')
+        ->assertJsonMissingPath('data.estimated_provider_cost');
 });
 
 it('creates one queued provider generation using the selected inputs and idempotency key', function () {
@@ -192,7 +197,47 @@ it('shows a user only their own generation history', function () {
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $owned->id)
-        ->assertJsonMissingPath('data.0.idempotency_key');
+        ->assertJsonMissingPath('data.0.idempotency_key')
+        ->assertJsonMissingPath('data.0.provider_cost');
+});
+
+it('filters generation history by status and treats pending as queued', function () {
+    $user = User::factory()->create();
+    $queued = generationFor($user, ['status' => GenerationStatus::Pending]);
+    generationFor($user, ['status' => GenerationStatus::Processing]);
+    generationFor($user, ['status' => GenerationStatus::Failed]);
+
+    $this->actingAs($user)->getJson('/generations?status=queued')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', $queued->id);
+
+    $this->getJson('/generations?status=failed')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.status', 'failed');
+});
+
+it('renders the generation workspace through Inertia with only the signed-in user history', function () {
+    $owner = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $owned = generationFor($owner);
+    generationFor($otherUser);
+
+    $this->actingAs($owner)->get('/generations')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Generations/Index')
+            ->where('generations.data.0.id', $owned->id)
+            ->where('generations.meta.total', 1)
+            ->missing('generations.data.0.idempotency_key'));
+});
+
+it('renders a separate Inertia page for creating a generation', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/generations/create')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('Generations/Create'));
 });
 
 it('does not keep an unaccepted generation when the provider rejects it', function () {
@@ -204,6 +249,27 @@ it('does not keep an unaccepted generation when the provider rejects it', functi
     $this->actingAs($user)->postJson('/generations', [
         'prompt' => '[blocked] prompt', 'size' => '1024x1024', 'quality' => 'low',
     ])->assertBadRequest();
+
+    $this->assertDatabaseCount('generations', 0);
+});
+
+it('flashes a user-friendly error when Pixelforge rejects a generation request', function () {
+    Http::fakeSequence()
+        ->push(pricingResponse(), 200)
+        ->push(['error' => ['message' => 'Missing or invalid API key.']], 401);
+    $user = User::factory()->create();
+    $input = ['prompt' => 'A lighthouse', 'size' => '1024x1024', 'quality' => 'low'];
+
+    $this->actingAs($user)->from('/generations/create')->post('/generations', $input)
+        ->assertRedirect('/generations/create');
+
+    $this->get('/generations/create', [
+        'X-Inertia' => 'true',
+        'X-Inertia-Version' => Inertia::getVersion(),
+    ])
+        ->assertOk()
+        ->assertJsonPath('flash.toast.type', 'error')
+        ->assertJsonPath('flash.toast.message', 'We could not submit this image request. Please try again.');
 
     $this->assertDatabaseCount('generations', 0);
 });

@@ -22,7 +22,7 @@ class DashboardTest extends TestCase
         $this->actingAs($user);
 
         $response = $this->get(route('dashboard'));
-        $response->assertOk();
+        $response->assertRedirect(route('generations.index'));
     }
 
     public function test_authenticated_users_do_not_need_email_verification_to_visit_the_dashboard()
@@ -31,6 +31,6 @@ class DashboardTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('dashboard'))
-            ->assertOk();
+            ->assertRedirect(route('generations.index'));
     }
 }

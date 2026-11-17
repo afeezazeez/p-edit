@@ -21,9 +21,17 @@ class GenerationService
         private readonly ApplyGenerationResult $applyResult,
     ) {}
 
-    public function history(User $user): LengthAwarePaginator
+    public function history(User $user, string $status = 'all'): LengthAwarePaginator
     {
-        return $user->generations()->latest()->paginate(20);
+        $query = $user->generations()->latest();
+
+        if ($status === 'queued') {
+            $query->whereIn('status', [GenerationStatus::Pending->value, GenerationStatus::Queued->value]);
+        } elseif ($status !== 'all') {
+            $query->where('status', GenerationStatus::from($status)->value);
+        }
+
+        return $query->paginate(20)->withQueryString();
     }
 
     public function estimate(array $input): array

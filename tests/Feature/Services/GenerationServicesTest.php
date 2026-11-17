@@ -24,8 +24,10 @@ it('calculates estimates through the generation service using the client pricing
 
     $estimate = $service->estimate(serviceInput());
 
-    expect($estimate['estimated_cost'])->toBe('0.02183750000')
-        ->and($estimate['provider_cost'])->toBe('0.01747000000');
+    expect($estimate['estimated_cost'])->toBe('0.01793125000')
+        ->and($estimate['estimated_min_cost'])->toBe('0.01402500000')
+        ->and($estimate['estimated_max_cost'])->toBe('0.02183750000')
+        ->and($estimate['provider_cost'])->toBe('0.01434500000');
 });
 
 it('creates and records a generation through the generation service', function () {

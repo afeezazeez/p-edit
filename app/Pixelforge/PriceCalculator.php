@@ -8,12 +8,20 @@ class PriceCalculator
 {
     public function estimate(string $prompt, int $referenceCount, string $size, string $quality, array $pricing): array
     {
-        $tokens = $this->estimatedTokens($prompt, $referenceCount, $size, $quality, $pricing);
+        $reasoning = $pricing['tokens']['reasoning'][$quality];
+        $minimumReasoning = (int) $reasoning['min'];
+        $maximumReasoning = (int) $reasoning['max'];
+        $expectedReasoning = intdiv($minimumReasoning + $maximumReasoning + 1, 2);
+        $tokens = $this->estimatedTokens($prompt, $referenceCount, $size, $quality, $pricing, $expectedReasoning);
         $providerNanodollars = $this->costInNanodollars($tokens, $pricing['rates']);
+        $minimumUsage = [...$tokens, 'reasoning_tokens' => $minimumReasoning];
+        $maximumUsage = [...$tokens, 'reasoning_tokens' => $maximumReasoning];
 
         return [
             'provider_cost' => $this->format($providerNanodollars * 100, 11),
             'estimated_cost' => $this->format($providerNanodollars * 125, 11),
+            'estimated_min_cost' => $this->format($this->costInNanodollars($minimumUsage, $pricing['rates']) * 125, 11),
+            'estimated_max_cost' => $this->format($this->costInNanodollars($maximumUsage, $pricing['rates']) * 125, 11),
             'rates' => $pricing['rates'],
             'estimated_usage' => $tokens,
         ];
@@ -29,7 +37,7 @@ class PriceCalculator
         return $this->format($this->costInNanodollars($usage, $rates) * 100, 11);
     }
 
-    private function estimatedTokens(string $prompt, int $referenceCount, string $size, string $quality, array $pricing): array
+    private function estimatedTokens(string $prompt, int $referenceCount, string $size, string $quality, array $pricing, int $reasoningTokens): array
     {
         $textCount = mb_strlen($prompt, 'UTF-8');
         $charactersPerToken = $pricing['tokens']['characters_per_text_token'];
@@ -41,7 +49,7 @@ class PriceCalculator
             'input_text_tokens' => $textTokens,
             'input_image_tokens' => $referenceCount * $pricing['tokens']['per_reference_image'],
             'output_tokens' => $pricing['tokens']['output'][$quality][$size],
-            'reasoning_tokens' => $pricing['tokens']['reasoning'][$quality]['max'],
+            'reasoning_tokens' => $reasoningTokens,
         ];
     }
 

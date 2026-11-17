@@ -11,8 +11,9 @@ class GenerationEstimateResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'estimated_provider_cost' => data_get($this->resource, 'provider_cost'),
             'estimated_cost' => data_get($this->resource, 'estimated_cost'),
+            'estimated_min_cost' => data_get($this->resource, 'estimated_min_cost'),
+            'estimated_max_cost' => data_get($this->resource, 'estimated_max_cost'),
             'currency' => 'USD',
         ];
     }

@@ -18,7 +18,6 @@ class GenerationResource extends JsonResource
             'reference_images' => $this->reference_images,
             'status' => $this->status->value,
             'estimated_cost' => $this->estimated_cost,
-            'provider_cost' => $this->provider_cost,
             'final_cost' => $this->final_cost,
             'currency' => $this->currency,
             'image_url' => $this->image_url,

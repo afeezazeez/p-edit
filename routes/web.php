@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/login')->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::redirect('dashboard', '/generations')->name('dashboard');
     Route::get('/generations', [GenerationController::class, 'index'])->name('generations.index');
+    Route::get('/generations/create', [GenerationController::class, 'create'])->name('generations.create');
     Route::post('/generations/estimate', [GenerationController::class, 'estimate'])->name('generations.estimate');
     Route::post('/generations', [GenerationController::class, 'store'])->name('generations.store');
 });
