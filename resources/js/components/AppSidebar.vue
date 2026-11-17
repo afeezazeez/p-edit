@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { ImagePlus } from '@lucide/vue';
+import { BarChart3, ImagePlus } from '@lucide/vue';
+import { usePage } from '@inertiajs/vue3';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -16,6 +17,7 @@ import {
 import { index as generationsIndex } from '@/routes/generations';
 import type { NavItem } from '@/types';
 
+const page = usePage<{ auth: { user: { role: string } } }>();
 const mainNavItems: NavItem[] = [
     {
         title: 'Generations',
@@ -23,6 +25,13 @@ const mainNavItems: NavItem[] = [
         icon: ImagePlus,
     },
 ];
+if (page.props.auth.user.role === 'admin') {
+    mainNavItems.push({
+        title: 'Cost report',
+        href: '/admin/reports/costs',
+        icon: BarChart3,
+    });
+}
 </script>
 
 <template>
